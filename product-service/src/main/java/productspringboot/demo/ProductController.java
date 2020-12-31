@@ -11,10 +11,12 @@ import java.util.List;
 public class ProductController {
 
     List<ProductInfo> productList = new ArrayList<ProductInfo>();
-    @GetMapping("/{id}")
+
+    @GetMapping("/product/details/{id}")
     public Product getProductDetails(@PathVariable int id){
         // Get Name from product-service
         ProductInfo productInfo = getProductInfo(id);
+
         // Get Price from pricing-service
         // Get Stock avail from inventory-service
         return new Product(productInfo.getProductId(), productInfo.getProductName(), 999, true);
