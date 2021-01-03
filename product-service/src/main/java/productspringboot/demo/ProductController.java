@@ -1,8 +1,11 @@
 package productspringboot.demo;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,17 +15,25 @@ public class ProductController {
 
     List<ProductInfo> productList = new ArrayList<ProductInfo>();
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+
     @GetMapping("/product/details/{id}")
-    public Product getProductDetails(@PathVariable int id){
+    public Product getProductDetails(@PathVariable Long id){
         // Get Name from product-service
         ProductInfo productInfo = getProductInfo(id);
 
         // Get Price from pricing-service
+        Price price = restTemplate.getForObject("http://localhost:8002/price/" + id, Price.class);
+
         // Get Stock avail from inventory-service
-        return new Product(productInfo.getProductId(), productInfo.getProductName(), 999, true);
+        Inventory inventory = restTemplate.getForObject("http://localhost:8003/inventory/" + id, Inventory.class);
+
+        return new Product(productInfo.getProductId(), productInfo.getProductName(), price.getDiscountedPrice(), inventory.isInStock());
     }
 
-    private ProductInfo getProductInfo(int id) {
+    private ProductInfo getProductInfo(Long id) {
         populateProductList();
 
         for (ProductInfo p : productList) {

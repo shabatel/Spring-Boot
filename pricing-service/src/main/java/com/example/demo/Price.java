@@ -13,7 +13,7 @@ public class Price {
         this.discountedPrice = discountedPrice;
     }
 
-    public long getPriceId() {
+    public int getPriceId() {
         return priceId;
     }
 
@@ -21,7 +21,7 @@ public class Price {
         this.priceId = priceId;
     }
 
-    public long getProductId() {
+    public int getProductId() {
         return productId;
     }
 

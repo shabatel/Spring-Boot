@@ -1,8 +1,10 @@
 package com.example.demo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +14,17 @@ public class PriceController {
 
     List<Price> priceList = new ArrayList<Price>();
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     @GetMapping("/price/{productId}")
     public Price getPriceDetails(@PathVariable int productId){
         Price price = getPriceInfo(productId);
 
-        return price;
+        //Get Exchange Value
+        double exgVal = restTemplate.getForObject("http://localhost:8004/currexg/from/USD/to/YEN",ExchangeVal.class).getExchangeVal();
+
+        return new Price(price.getPriceId() ,price.getProductId(), price.getOriginalPrice(), (int)Math.multiplyExact((long) exgVal, price.getDiscountedPrice()));
     }
 
     private Price getPriceInfo(int productId) {
